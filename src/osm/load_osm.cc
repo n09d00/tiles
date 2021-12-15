@@ -59,16 +59,34 @@ struct tmp_file {
   FILE* file_;
 };
 
+std::string convert_xml_pbf(std::string const& osm_fname) {
+  boost::filesystem::path path(osm_fname);
+  std::string new_fname = path.stem().string()+".osm.pbf";
+  std::string const& exe = "osmium cat "+osm_fname+" -o "+new_fname;
+  char * c = new char[exe.length()+1];
+  std::strcpy(c, exe.c_str());
+  system(c);
+  return new_fname;
+}
+
 void load_osm(tile_db_handle& db_handle, feature_inserter_mt& inserter,
               std::string const& osm_fname, std::string const& osm_profile,
               std::string const& tmp_dname) {
   oio::File input_file;
   size_t file_size{0};
+
+  std::string fname = osm_fname;
+  std::string file_extension = boost::filesystem::extension(osm_fname);
+  if(file_extension == ".osm") {
+    std::cout << ".osm file detected -- convert to .osm.pbf\n";
+    fname = convert_xml_pbf(osm_fname);
+  } 
+
   try {
-    input_file = oio::File{osm_fname};
+    input_file = oio::File{fname};
     file_size = oio::Reader{input_file}.file_size();
   } catch (...) {
-    t_log("load_osm failed [file={}]", osm_fname);
+    t_log("load_osm failed [file={}]", fname);
     throw;
   }
 
