@@ -62,7 +62,7 @@ struct tmp_file {
 std::string convert_xml_pbf(std::string const& osm_fname) {
   boost::filesystem::path path(osm_fname);
   std::string new_fname = path.stem().string()+".osm.pbf";
-  std::string const& exe = "osmium cat "+osm_fname+" -o "+new_fname;
+  std::string const& exe = "osmium cat "+osm_fname+" -o "+new_fname+" --overwrite";
   char * c = new char[exe.length()+1];
   std::strcpy(c, exe.c_str());
   system(c);
