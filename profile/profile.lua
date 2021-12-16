@@ -110,121 +110,121 @@ function process_way(way)
   end
 end
 
--- function process_area(area)
---   if area:has_any_tag("building") then
---     area:set_target_layer("building")
---     area:set_approved_min_by_area(14, 1e8,
---                                   12, 1e10,
---                                   10, -1)
+function process_area(area)
+  if area:has_any_tag("building") then
+    area:set_target_layer("building")
+    area:set_approved_min_by_area(14, 1e8,
+                                  12, 1e10,
+                                  10, -1)
 
---   elseif area:has_any_tag("landuse", "residential", "retail", "industrial", "commercial") then
---     area:set_target_layer("landuse")
---     area:add_tag_as_string("landuse")
---     area:set_approved_min_by_area(14, 1e8,
---                                   10, 1e10,
---                                    8, -1)
+  elseif area:has_any_tag("landuse", "residential", "retail", "industrial", "commercial") then
+    area:set_target_layer("landuse")
+    area:add_tag_as_string("landuse")
+    area:set_approved_min_by_area(14, 1e8,
+                                  10, 1e10,
+                                   8, -1)
 
---   elseif area:has_any_tag("landuse", "quarry", "farmyard", "railway") then
---     area:set_target_layer("landuse")
---     area:add_string("landuse", "industrial")
---     area:set_approved_min_by_area(14, 1e8,
---                                   10, 1e10,
---                                    8, -1)
+  elseif area:has_any_tag("landuse", "quarry", "farmyard", "railway") then
+    area:set_target_layer("landuse")
+    area:add_string("landuse", "industrial")
+    area:set_approved_min_by_area(14, 1e8,
+                                  10, 1e10,
+                                   8, -1)
 
---   elseif area:has_tag("leisure", "sports_centre") or
---          area:has_tag("amenity", "hospital") or
---          area:has_tag("amenity", "police") or
---          area:has_tag("amenity", "fire_station") or
---          area:has_tag("amenity", "kindergarten") or
---          area:has_tag("amenity", "school") or
---          area:has_tag("amenity", "place_of_worship") or
---          area:has_tag("amenity", "university") then
---     area:set_target_layer("landuse")
---     area:add_string("landuse", "complex")
---     area:set_approved_min_by_area(14, 1e8,
---                                   10, 1e10,
---                                    8, -1)
+  elseif area:has_tag("leisure", "sports_centre") or
+         area:has_tag("amenity", "hospital") or
+         area:has_tag("amenity", "police") or
+         area:has_tag("amenity", "fire_station") or
+         area:has_tag("amenity", "kindergarten") or
+         area:has_tag("amenity", "school") or
+         area:has_tag("amenity", "place_of_worship") or
+         area:has_tag("amenity", "university") then
+    area:set_target_layer("landuse")
+    area:add_string("landuse", "complex")
+    area:set_approved_min_by_area(14, 1e8,
+                                  10, 1e10,
+                                   8, -1)
 
---   elseif area:has_tag("landuse", "forest") or
---          area:has_tag("natural", "wood") or
---          area:has_tag("natural", "oarchard") or
---          area:has_tag("natural", "scrub") then
---     area:set_target_layer("landuse")
---     area:add_string("landuse", "nature_heavy")
---     area:set_approved_min_by_area(14, 1e8,
---                                   10, 1e10,
---                                    8, -1)
+  elseif area:has_tag("landuse", "forest") or
+         area:has_tag("natural", "wood") or
+         area:has_tag("natural", "oarchard") or
+         area:has_tag("natural", "scrub") then
+    area:set_target_layer("landuse")
+    area:add_string("landuse", "nature_heavy")
+    area:set_approved_min_by_area(14, 1e8,
+                                  10, 1e10,
+                                   8, -1)
 
---   elseif area:has_tag("landuse", "farmland") or
---          area:has_tag("landuse", "vineyard") or
---          area:has_tag("landuse", "plant_nursery") or
---          area:has_tag("landuse", "meadow") or
---          area:has_tag("natural", "grassland") or
---          area:has_tag("landuse", "grass") then
---     area:set_target_layer("landuse")
---     area:add_string("landuse", "nature_light")
---     area:set_approved_min_by_area(14, 1e8,
---                                   10, 1e10,
---                                    8, -1)
+  elseif area:has_tag("landuse", "farmland") or
+         area:has_tag("landuse", "vineyard") or
+         area:has_tag("landuse", "plant_nursery") or
+         area:has_tag("landuse", "meadow") or
+         area:has_tag("natural", "grassland") or
+         area:has_tag("landuse", "grass") then
+    area:set_target_layer("landuse")
+    area:add_string("landuse", "nature_light")
+    area:set_approved_min_by_area(14, 1e8,
+                                  10, 1e10,
+                                   8, -1)
 
---   elseif area:has_tag("leisure", "park") or
---          area:has_tag("leisure", "garden") or
---          area:has_tag("leisure", "playground") or
---          area:has_tag("leisure", "stadium") or
---          area:has_tag("landuse", "recreation_ground") or
---          area:has_tag("landuse", "greenhouse_horticulture") or
---          area:has_tag("landuse", "allotments") then
---     area:set_target_layer("landuse")
---     area:add_string("landuse", "park")
---     area:set_approved_min_by_area(14, 1e8,
---                                   10, 1e10,
---                                    8, -1)
+  elseif area:has_tag("leisure", "park") or
+         area:has_tag("leisure", "garden") or
+         area:has_tag("leisure", "playground") or
+         area:has_tag("leisure", "stadium") or
+         area:has_tag("landuse", "recreation_ground") or
+         area:has_tag("landuse", "greenhouse_horticulture") or
+         area:has_tag("landuse", "allotments") then
+    area:set_target_layer("landuse")
+    area:add_string("landuse", "park")
+    area:set_approved_min_by_area(14, 1e8,
+                                  10, 1e10,
+                                   8, -1)
 
---   elseif area:has_tag("landuse", "cemetery") then
---     area:set_target_layer("landuse")
---     area:add_string("landuse", "cemetery")
---     area:set_approved_min_by_area(14, 1e8,
---                                   10, 1e10,
---                                    8, -1)
+  elseif area:has_tag("landuse", "cemetery") then
+    area:set_target_layer("landuse")
+    area:add_string("landuse", "cemetery")
+    area:set_approved_min_by_area(14, 1e8,
+                                  10, 1e10,
+                                   8, -1)
 
 
---   elseif area:has_tag("landuse", "brownfield") or
---          area:has_tag("landuse", "greenfield") or
---          area:has_tag("landuse", "construction") then
---     area:set_target_layer("construction")
---     area:set_approved_min_by_area(14, 1e8,
---                                   10, 1e10,
---                                    8, -1)
+  elseif area:has_tag("landuse", "brownfield") or
+         area:has_tag("landuse", "greenfield") or
+         area:has_tag("landuse", "construction") then
+    area:set_target_layer("construction")
+    area:set_approved_min_by_area(14, 1e8,
+                                  10, 1e10,
+                                   8, -1)
 
---   elseif area:has_tag("natural", "water") or
---          area:has_tag("waterway", "riverbank") or
---          area:has_tag("waterway", "basin") or
---          area:has_tag("waterway", "pond") or
---          area:has_tag("leisure", "swimming_pool") then
---     area:set_target_layer("water")
---     area:set_approved_min_by_area(12, 1e6,
---                                   10, 1e4,
---                                    0, -1)
+  elseif area:has_tag("natural", "water") or
+         area:has_tag("waterway", "riverbank") or
+         area:has_tag("waterway", "basin") or
+         area:has_tag("waterway", "pond") or
+         area:has_tag("leisure", "swimming_pool") then
+    area:set_target_layer("water")
+    area:set_approved_min_by_area(12, 1e6,
+                                  10, 1e4,
+                                   0, -1)
 
---   elseif area:has_tag("natural", "beach") then
---     area:set_target_layer("landuse")
---     area:add_string("landuse", "beach")
---     area:set_approved_min_by_area(14, 1e8,
---                                   10, 1e10,
---                                    8, -1)
+  elseif area:has_tag("natural", "beach") then
+    area:set_target_layer("landuse")
+    area:add_string("landuse", "beach")
+    area:set_approved_min_by_area(14, 1e8,
+                                  10, 1e10,
+                                   8, -1)
 
---   elseif area:has_tag("highway", "pedestrian") or
---          area:has_tag("highway", "service") or
---          area:has_tag("amenity", "parking") then
---     area:set_target_layer("pedestrian")
---     area:set_approved_min_by_area(12, 1e8,
---                                   10, 1e10,
---                                   8, -1)
+  elseif area:has_tag("highway", "pedestrian") or
+         area:has_tag("highway", "service") or
+         area:has_tag("amenity", "parking") then
+    area:set_target_layer("pedestrian")
+    area:set_approved_min_by_area(12, 1e8,
+                                  10, 1e10,
+                                  8, -1)
 
---   elseif area:has_tag("leisure", "pitch") then
---     area:set_target_layer("sport")
---     area:set_approved_min_by_area(14, 1e8,
---                                   12, 1e10,
---                                   8, -1)
---   end
--- end
+  elseif area:has_tag("leisure", "pitch") then
+    area:set_target_layer("sport")
+    area:set_approved_min_by_area(14, 1e8,
+                                  12, 1e10,
+                                  8, -1)
+  end
+end

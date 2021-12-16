@@ -50,6 +50,29 @@ wget https://download.geofabrik.de/europe/germany-latest.osm.pbf
 # Now, go to localhost:8888 in your browser.
 ```
 
+## Create own coastline
+```
+# requirements:
+sudo apt install osmcoasline
+sudo apt install gdal-bin
+sudo apt install zip unzip
+
+# download an osm file from which to extract the coastline
+wget __/fname.osm.pbf
+
+# extract coastline
+osmcoastline -o fname.db fname.osm.pbf
+
+# create shapefiles
+ogr2ogr -f "ESRI Shapefile" fname.shp fname.db land_polygons
+
+# create fname.cpg file, containing "UTF-8"
+
+# move all files (fname.cpg/.dbf/.prj/.shp/.shx) into a directory and zip the folder
+
+# use the zipped folder as the --costlines_fname parameter
+```
+
 ## License
 
 MIT
