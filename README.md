@@ -73,6 +73,19 @@ ogr2ogr -f "ESRI Shapefile" fname.shp fname.db land_polygons
 # use the zipped folder as the --costlines_fname parameter
 ```
 
+## create geojson files
+'''
+# requirements:
+sudo apt install osmcoasline
+
+# create file containing all points/nodes
+osmium export fname.osm -o fname_nodes.geojson --geometry-types=point
+
+# create file containing all linestrings/ways
+osmium export fname.osm -o fname_ways.geojson --geometry-types=linestring
+
+'''
+
 ## License
 
 MIT
