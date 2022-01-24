@@ -76,7 +76,7 @@ ogr2ogr -f "ESRI Shapefile" fname.shp fname.db land_polygons
 ## create geojson files
 ```
 # requirements:
-sudo apt install osmcoasline
+sudo apt install osm-tool
 
 # create file containing all points/nodes
 osmium export fname.osm -o fname_nodes.geojson --geometry-types=point
