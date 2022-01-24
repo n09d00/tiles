@@ -78,8 +78,17 @@ ogr2ogr -f "ESRI Shapefile" fname.shp fname.db land_polygons
 # requirements:
 sudo apt install osmium-tool
 
-# create file containing all points/nodes
-osmium export fname.osm -o fname_nodes.geojson --geometry-types=point
+# create osm file containing all nodes with a name
+osmium tags-filter fname.osm -o fname_with_name.osm n/name!=.
+
+# create osm file containing all nodes without a name
+osmium tags-filter fname.osm -o fname_without_name.osm n/name=.
+
+# create file containing all points/nodes with name
+osmium export fname_with_name.osm -o fname_nodes_with_name.geojson --geometry-types=point
+
+# create file containing all points/nodes without name
+osmium export fname_without_name.osm -o fname_nodes_without_name.geojson --geometry-types=point
 
 # create file containing all linestrings/ways
 osmium export fname.osm -o fname_ways.geojson --geometry-types=linestring
