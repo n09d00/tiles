@@ -92,6 +92,10 @@ osmium export fname_without_name.osm -o fname_nodes_without_name.geojson --geome
 
 # create file containing all linestrings/ways
 osmium export fname.osm -o fname_ways.geojson --geometry-types=linestring
+
+# convert geojson to osm
+npm install geojsontoosm
+geojsontoosm fname.geojson > fname.osm
 ```
 
 ## License
