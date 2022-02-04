@@ -31,6 +31,7 @@
       },
       zoom: 14,
       center: [8.6671065, 49.8747541],
+      // maxBounds: [[4, 49], [13, 52]], 	// [[west, south], [east, north]]
       hash: "location",
       transformRequest: (url, resourceType) => {
         if (url.startsWith('/')) {
@@ -42,8 +43,137 @@
     const styles = { style_default, style_background };
     const style = (/[&|#]style=(.*?)(&|$)/g.exec(window.location.href) || [])[1] || "default";
 
-    map.on('load', () =>
-      (styles["style_" + style] || style_default)(map));
+    map.on('load', () => {
+      (styles["style_" + style] || style_default)(map);
+    });
+
+    map.on('style.load', function() {
+      // add points
+      map.addSource("points", {
+        "type": "geojson",
+        "data": 'https://jonasrehn.github.io/structure_4_points_without_name.geojson'
+      });
+      
+      map.addLayer({
+        'id': 'point-layer',
+        'type': 'circle',
+        'source': 'points',
+        'minzoom': 15,
+        'paint': {
+          'circle-radius': 3,
+          'circle-color': 'black',
+        }
+      });
+
+      map.loadImage(
+        'https://img.icons8.com/material-outlined/24/000000/railway-station.png',
+        function (error, image) {
+          if (error) throw error;
+          map.addImage('custom-marker', image);
+          map.addSource("names", {
+            "type": "geojson",
+            "data": 'https://jonasrehn.github.io/structure_4_points_with_name.geojson'
+          });
+
+          map.addLayer({
+            'id': 'name-layer',
+            'type': 'symbol',
+            'source': 'names',
+            // 'minzoom': 8,
+            'layout': {
+              'icon-image': 'custom-marker',
+              'icon-size': 0.75//, // factor of original icon size
+              // get the year from the source's "year" property
+              // 'text-field': 'test', // ['get', 'name'],
+              // 'text-font': [
+              //   'Open Sans Semibold',
+              //   'Arial Unicode MS Bold'
+              // ],
+              // 'text-offset': [0, 1.25],
+              // 'text-anchor': 'top'
+            }
+          });
+        }
+      );
+
+      // add linestrings
+      map.addSource("ways", {
+        "type": "geojson",
+        "data": 'https://jonasrehn.github.io/structure_4_ways.geojson'
+      });
+      
+      map.addLayer({
+        'id': 'way-layer',
+        'type': 'line',
+        'source': 'ways',
+        'layout': {
+          'line-join': 'round',
+          'line-cap': 'round'
+        },
+        'paint': {
+          'line-color': '#888',
+          'line-width': 2
+        }
+      });
+
+      // add linestrings
+      map.addSource("borders", {
+        "type": "geojson",
+        "data": 'https://jonasrehn.github.io/admin-level-1-2-small.geojson',
+        "tolerance": 3
+      });
+      
+      map.addLayer({
+        'id': 'border-layer',
+        'type': 'line',
+        'source': 'borders',
+        'layout': {
+          'line-join': 'round',
+          'line-cap': 'round'
+        },
+        'paint': {
+          'line-color': '#0080ff',
+          'line-width': 1
+        }
+      });
+
+      // show details when a point was clicked
+      map.on('click', 'point-layer', (e) => {
+        var coordinates = e.lngLat;
+        new mapboxgl.Popup()
+          .setLngLat(coordinates)
+          .setHTML('you clicked here: <br/>' + e.features[0].properties.place)
+          .addTo(map);
+      });
+
+      map.on('click', 'name-layer', (e) => {
+        var coordinates = e.lngLat;
+        new mapboxgl.Popup()
+          .setLngLat(coordinates)
+          .setHTML('you clicked here: <br/>' + e.features[0].properties.name)
+          .addTo(map);
+      });
+
+      // Change the cursor to a pointer when the mouse is over the places layer.
+      map.on('mouseenter', 'point-layer', () => {
+        map.getCanvas().style.cursor = 'pointer';
+      });
+      
+      // Change it back to a pointer when it leaves.
+      map.on('mouseleave', 'point-layer', () => {
+        map.getCanvas().style.cursor = '';
+      });
+      
+      // Change the cursor to a pointer when the mouse is over the places layer.
+      map.on('mouseenter', 'name-layer', () => {
+        map.getCanvas().style.cursor = 'pointer';
+      });
+      
+      // Change it back to a pointer when it leaves.
+      map.on('mouseleave', 'name-layer', () => {
+        map.getCanvas().style.cursor = '';
+      });
+    });
   </script>
 </body>
 
