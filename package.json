@@ -9,6 +9,6 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "npm install eslint --save-dev && npm install --save-dev eslint @html-eslint/parser @html-eslint/eslint-plugin",
-    "lint": "npx eslint ./web"
+    "lint": "npx eslint ./client"
   }
 }
