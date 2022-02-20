@@ -8,7 +8,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "npm install eslint --save-dev && npm install --save-dev eslint @html-eslint/parser @html-eslint/eslint-plugin",
+    "build": "npm install eslint --save-dev && npm install --save-dev eslint-plugin-html",
     "lint": "npx eslint ./client"
   }
 }
