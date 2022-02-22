@@ -12,11 +12,62 @@
     height: 100%;
     width: 100%;
   }
+
+  /* The sidepanel menu */
+  .sidepanel {
+    height: 100%; /* Specify a height */
+    width: 0; /* 0 width - change this with JavaScript */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Stay on top */
+    top: 0;
+    left: 0;
+    background-color: #FFFFFF; 
+    overflow: hidden; 
+    transition: 0.5s; 
+  }
+
+  /* Position and style the close button (top right corner) */
+  .sidepanel .closebtn {
+    position: absolute;
+    top: 0;
+    right: 25px;
+    font-size: 36px;
+    margin-left: 50px;
+  }
+
+  .myDiv {
+    cursor: pointer;
+  }
+
+  table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  td, th {
+    /* border: 1px solid #dddddd; */
+    text-align: left;
+    padding: 8px;
+  }
+
+  select {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+  }
 </style>
 </head>
 
-<body>
+<body style="overflow:hidden;">
   <div id="map"></div>
+  <div id="mySidepanel" class="sidepanel">
+    <div id="closeBtn" class="closebtn" style="cursor: pointer">&times;</div>
+    <div id="infoContent"></div>
+    <select name='name' id="stationRouteSelector" onchange="selectStationRoute()">
+      <option value="none">--Select station route--</option>
+    </select>
+  </div>
 
   <script type="module">
     import { style as style_default } from './style-default.js'
@@ -31,7 +82,8 @@
       },
       zoom: 14,
       center: [8.6671065, 49.8747541],
-      // maxBounds: [[4, 49], [13, 52]], 	// [[west, south], [east, north]]
+      maxBounds: [[-31, 35], [48, 62]], 	// [[west, south], [east, north]]
+      bearing: 0,
       hash: "location",
       transformRequest: (url, resourceType) => {
         if (url.startsWith('/')) {
@@ -42,66 +94,21 @@
 
     const styles = { style_default, style_background };
     const style = (/[&|#]style=(.*?)(&|$)/g.exec(window.location.href) || [])[1] || "default";
+    //preambel of the name of the geojson files
+    const fname = 'http://localhost:8888/structure';
+    var stationRoutes = {};
 
     map.on('load', () => {
       (styles["style_" + style] || style_default)(map);
     });
 
     map.on('style.load', function() {
-      // add points
-      map.addSource("points", {
-        "type": "geojson",
-        "data": 'https://jonasrehn.github.io/structure_4_points_without_name.geojson'
-      });
-      
-      map.addLayer({
-        'id': 'point-layer',
-        'type': 'circle',
-        'source': 'points',
-        'minzoom': 15,
-        'paint': {
-          'circle-radius': 3,
-          'circle-color': 'black',
-        }
-      });
-
-      map.loadImage(
-        'https://img.icons8.com/material-outlined/24/000000/railway-station.png',
-        function (error, image) {
-          if (error) throw error;
-          map.addImage('custom-marker', image);
-          map.addSource("names", {
-            "type": "geojson",
-            "data": 'https://jonasrehn.github.io/structure_4_points_with_name.geojson'
-          });
-
-          map.addLayer({
-            'id': 'name-layer',
-            'type': 'symbol',
-            'source': 'names',
-            // 'minzoom': 8,
-            'layout': {
-              'icon-image': 'custom-marker',
-              'icon-size': 0.75//, // factor of original icon size
-              // get the year from the source's "year" property
-              // 'text-field': 'test', // ['get', 'name'],
-              // 'text-font': [
-              //   'Open Sans Semibold',
-              //   'Arial Unicode MS Bold'
-              // ],
-              // 'text-offset': [0, 1.25],
-              // 'text-anchor': 'top'
-            }
-          });
-        }
-      );
-
       // add linestrings
       map.addSource("ways", {
         "type": "geojson",
-        "data": 'https://jonasrehn.github.io/structure_4_ways.geojson'
+        "data": fname + '_lines.geojson'
       });
-      
+
       map.addLayer({
         'id': 'way-layer',
         'type': 'line',
@@ -116,42 +123,96 @@
         }
       });
 
-      // add linestrings
-      map.addSource("borders", {
+      // add points
+      map.addSource("points", {
         "type": "geojson",
-        "data": 'https://jonasrehn.github.io/admin-level-1-2-small.geojson',
-        "tolerance": 3
+        "data": fname + '_elements.geojson'
       });
       
       map.addLayer({
-        'id': 'border-layer',
-        'type': 'line',
-        'source': 'borders',
-        'layout': {
-          'line-join': 'round',
-          'line-cap': 'round'
-        },
+        'id': 'point-layer',
+        'type': 'circle',
+        'source': 'points',
+        'minzoom': 15,
         'paint': {
-          'line-color': '#0080ff',
-          'line-width': 1
+          'circle-radius': 4,
+          'circle-color': 'black',
         }
       });
 
+      map.loadImage(
+        'https://img.icons8.com/material-outlined/24/000000/railway-station.png',
+        function (error, image) {
+          if (error) throw error;
+          map.addImage('custom-marker', image);
+          map.addSource("names", {
+            "type": "geojson",
+            "data": fname + '_stations.geojson'
+          });
+
+          map.addLayer({
+            'id': 'name-layer',
+            'type': 'symbol',
+            'source': 'names',
+            // 'minzoom': 8,
+            'layout': {
+              'icon-image': 'custom-marker',
+              'icon-size': 0.75   // factor of original icon size
+            }
+          });
+        }
+      );
+
+      fetch(fname + "_station_routes.geojson")
+          .then(response => response.json())
+          .then(json => {stationRoutes = json; createSelectorStationRoutes()});
+
+      // add station route points
+      map.addSource("station-route-points", {
+        "type": "geojson",
+        "data": stationRoutes
+      });
+      
+      map.addLayer({
+        'id': 'station-route-point-layer',
+        'type': 'circle',
+        'source': 'station-route-points',
+        'minzoom': 14,
+        'layout': {
+          'visibility': 'visble'
+        },
+        'paint': {
+          'circle-radius': 4,
+          'circle-color': 'red',
+        },
+        'filter': ['all', ['==', '$type', 'Point'], ['==', 'name', 'ZDW_rg.Gls3.ZDS_rg']]
+      });  
+      
+      map.addLayer({
+        'id': 'station-route-way-layer',
+        'type': 'line',
+        'source': 'station-route-points',
+        'minzoom': 14,
+        'layout': {
+          'line-join': 'round',
+          'line-cap': 'round',
+          'visibility': 'visible'
+        },
+        'paint': {
+          'line-color': 'red',
+          'line-width': 2
+        },
+        'filter': ['all', ['==', '$type', 'LineString'], ['==', 'name', 'ZDW_rg.Gls3.ZDS_rg']]
+      }); 
+
       // show details when a point was clicked
       map.on('click', 'point-layer', (e) => {
-        var coordinates = e.lngLat;
-        new mapboxgl.Popup()
-          .setLngLat(coordinates)
-          .setHTML('you clicked here: <br/>' + e.features[0].properties.place)
-          .addTo(map);
+        showInfo('point', e.features[0].properties);
       });
 
+      // show details when a station was clicked
       map.on('click', 'name-layer', (e) => {
-        var coordinates = e.lngLat;
-        new mapboxgl.Popup()
-          .setLngLat(coordinates)
-          .setHTML('you clicked here: <br/>' + e.features[0].properties.name)
-          .addTo(map);
+        showInfo('name', e.features[0].properties);
       });
 
       // Change the cursor to a pointer when the mouse is over the places layer.
@@ -174,6 +235,104 @@
         map.getCanvas().style.cursor = '';
       });
     });
+
+    /*
+      info panel related code
+    */
+    map.on('click', function(e) {
+      closeNav();
+    });
+
+    function showInfo(type, properties) {
+      document.getElementById("infoContent").style.padding = "0px 25px";
+      var content = 'Default';
+      if (type == 'name') {
+        content = getStationContent(properties);
+        document.getElementById("stationRouteSelector").style.visibility = "visible";
+      } else {
+        content = getElementContent(properties);
+        document.getElementById("stationRouteSelector").style.visibility = "hidden";
+      }
+      document.getElementById("infoContent").innerHTML = content;
+      openNav();
+    }
+
+    /* Set the width of the sidebar to 250px (show it) */
+    function openNav() {
+      document.getElementById("mySidepanel").style.width = "20%";
+    }
+
+    /* Set the width of the sidebar to 0 (hide it) */
+    function closeNav() {
+      document.getElementById("mySidepanel").style.width = "0";
+    }
+
+    document.getElementById("closeBtn").onclick = function() {
+      closeNav()
+    };
+
+    /* creates a HTML content page for stations */
+    function getStationContent(properties) {
+      var content = '<h1>' + properties.name + '</h1>\n';
+      content += '<table>\n';
+      for (const [key, value] of Object.entries(properties)) {
+        if(key != 'name') {
+          content += '<tr><td>' + key + '</td><td>' + value + '</td></tr>\n';
+        }
+      }
+      content += '</table>';
+      return content;
+    }
+
+    /* creates a HTML content page for elements */
+    function getElementContent(properties) {
+      var content = '';
+      content += '<table style="margin-top:50px">\n';
+      for (const [key, value] of Object.entries(properties)) {
+        content += '<tr><td>' + key + '</td><td>' + value + '</td></tr>\n';
+      }
+      content += '</table>';
+      return content;
+    }
+
+    /*
+      station route related code
+    */
+      // map.setFilter('station-route-point-layer', ['all', ['==', 'name', 'ZDK_gg.Gls3.ZDF_gg']]);
+      // map.setLayoutProperty('station-route-point-layer', 'visibility', 'visible');
+      // const features = map.querySourceFeatures('station-route-points');
+      // fetch("http://localhost:8888/other_relations.geojson")
+      //     .then(response => response.json())
+      //     .then(json => showInfo('point', json.features));
+          //name = .properties.name
+    /* create selector for station routes */
+    function createSelectorStationRoutes() {
+      var select = document.getElementById('stationRouteSelector');
+      for(var feature of stationRoutes.features) {
+        var name = feature.properties.name;
+        var option = '<option value="' + name + '">' + name + '</option>';
+        select.insertAdjacentHTML( 'beforeend', option );
+      }
+    }
+
+    /* shows the selected station route */
+    document.getElementById("stationRouteSelector").addEventListener("change", selectStationRoute());
+    function selectStationRoute() {
+      var value = 'ZDW_rg.Gls3.ZDS_rg';
+      // alert('hi');
+      // var value = document.getElementById("stationRouteSelector").value;
+      // alert(value);
+      if(vale == 'none') {
+        //no route was selected
+        map.setLayoutProperty('station-route-point-layer', 'visibility', 'none');
+        map.setLayoutProperty('station-route-way-layer', 'visibility', 'none');
+      } else {
+        map.setFilter('station-route-point-layer', ['all', ['==', 'name', value]]);
+        map.setLayoutProperty('station-route-point-layer', 'visibility', 'visible');
+        map.setFilter('station-route-way-layer', ['all', ['==', 'name', value]]);
+        map.setLayoutProperty('station-route-way-layer', 'visibility', 'vsible');
+      }
+    }
   </script>
 </body>
 

@@ -151,11 +151,13 @@ struct server_settings : public conf::configuration {
   server_settings() : configuration("tiles-server options", "") {
     param(db_fname_, "db_fname", "/path/to/tiles.mdb");
     param(res_dname_, "res_dname", "/path/to/res");
+    param(geojson_dname_, "geojson_dname", "/path/to/geojson/files");
     param(port_, "port", "the http port of the server");
   }
 
   std::string db_fname_{"tiles.mdb"};
   std::string res_dname_;
+  std::string geojson_dname_{""};  //<================= change here to your location of the folder containing all required geojson files
   uint16_t port_{8888};
 };
 
@@ -247,24 +249,45 @@ int run_tiles_server(int argc, char const** argv) {
       return false;
     }
 
+    if(match) {
+      std::cout << "match true\n";
+    } else {
+      std::cout << "match false\n";
+    }
+
     bool found = false;
     std::string fname(match ? match->at(1) : "index.html");
+    std::cout << "filename " << fname << "\n";
+    std::cout << "resource directory " << opt.res_dname_.empty() << "\n";
     if (!opt.res_dname_.empty()) {
+      std::cout << "here 1\n";
       auto p = boost::filesystem::path{opt.res_dname_} / fname;
       if (boost::filesystem::exists(p)) {
+        std::cout << "here 2\n";
         utl::mmap_reader mem{p.string().c_str()};
         res.body() = std::string{mem.m_.ptr(), mem.m_.size()};
         found = true;
       }
+    } else if(boost::algorithm::ends_with(fname, ".geojson") && !opt.geojson_dname_.empty()) {
+        std::cout << "here 3\n";
+        auto p = boost::filesystem::path{opt.geojson_dname_} / fname;
+        if (boost::filesystem::exists(p)) {
+          std::cout << "here 4\n";
+          utl::mmap_reader mem{p.string().c_str()};
+          res.body() = std::string{mem.m_.ptr(), mem.m_.size()};
+          found = true;
+        }
     }
 
     if (!found) {
       try {
+        std::cout << "here 5\n";
         auto const mem = tiles_server_res::get_resource(fname);
         res.body() =
             std::string{reinterpret_cast<char const*>(mem.ptr_), mem.size_};
         found = true;
       } catch (std::out_of_range const&) {
+        std::cout << "here 6\n";
         // tough luck
       }
     }
@@ -277,9 +300,14 @@ int run_tiles_server(int argc, char const** argv) {
         res.set(http::field::content_type, "text/css");
       } else if (boost::algorithm::ends_with(fname, ".js")) {
         res.set(http::field::content_type, "text/javascript");
+      } else if (boost::algorithm::ends_with(fname, ".geojson")) {
+        res.set(http::field::content_type, "text/json");
+      } else {
+        std::cout << "file not supported\n";
       }
     } else {
       res.result(http::status::not_found);
+      std::cout << "file not found\n"; 
     }
 
     return true;
