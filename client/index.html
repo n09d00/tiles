@@ -95,7 +95,7 @@
     const styles = { style_default, style_background };
     const style = (/[&|#]style=(.*?)(&|$)/g.exec(window.location.href) || [])[1] || "default";
     //preambel of the name of the geojson files
-    const fname = 'http://localhost:8888/structure';
+    const fname = 'http://localhost:8080/structure';
     var stationRoutes = {};
 
     map.on('load', () => {
@@ -179,7 +179,7 @@
         'source': 'station-route-points',
         'minzoom': 14,
         'layout': {
-          'visibility': 'visble'
+          'visibility': 'visible'
         },
         'paint': {
           'circle-radius': 4,
@@ -322,7 +322,7 @@
       // alert('hi');
       // var value = document.getElementById("stationRouteSelector").value;
       // alert(value);
-      if(vale == 'none') {
+      if(value == 'none') {
         //no route was selected
         map.setLayoutProperty('station-route-point-layer', 'visibility', 'none');
         map.setLayoutProperty('station-route-way-layer', 'visibility', 'none');

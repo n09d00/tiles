@@ -74,7 +74,7 @@ export const style = (map) => {
         "osm": {
             "type": "vector",
             "tiles": ["/{z}/{x}/{y}.mvt"],
-            "maxzoom": 20
+            "maxzoom": 14
         }
     },
     "glyphs": "/glyphs/{fontstack}/{range}.pbf",
@@ -332,7 +332,109 @@ export const style = (map) => {
               "text-halo-color": "white",
               "text-color": "#111111"
             }
-        }
+        },
+        {
+            "id": "boundary-land-level-4",
+            "type": "line",
+            "source": "osm",
+            "source-layer": "boundary",
+            "filter": [
+                "all",
+                [">=", "admin_level", 3],
+                ["<=", "admin_level", 8],
+                ["!=", "maritime", 1]
+            ],
+            "layout": {"line-join": "round", "visibility": "visible"},
+            "paint": {
+                "line-color": "#9e9cab",
+                "line-dasharray": [3, 1, 1, 1],
+                "line-width": {"base": 1.4, "stops": [[4, 0.4], [5, 1], [12, 3]]}
+            }
+        },
+        {
+            "id": "boundary-land-level-2",
+            "type": "line",
+            "source": "osm",
+            "source-layer": "boundary",
+            "filter": [
+                "all",
+                ["==", "admin_level", 2],
+                ["!=", "maritime", 1],
+                ["!=", "disputed", 1]
+            ],
+            "layout": {
+                "line-cap": "round",
+                "line-join": "round",
+                "visibility": "visible"
+            },
+            "paint": {
+                "line-color": "hsl(248, 7%, 66%)",
+                "line-width": {
+                    "base": 1,
+                    "stops": [[0, 0.6], [4, 1.4], [5, 2], [12, 8]]
+                }
+            }
+        },
+        {
+            "id": "boundary-land-disputed",
+            "type": "line",
+            "source": "osm",
+            "source-layer": "boundary",
+            "filter": ["all", ["!=", "maritime", 1], ["==", "disputed", 1]],
+            "layout": {
+                "line-cap": "round",
+                "line-join": "round",
+                "visibility": "visible"
+            },
+            "paint": {
+                "line-color": "hsl(248, 7%, 70%)",
+                "line-dasharray": [1, 3],
+                "line-width": {
+                    "base": 1,
+                    "stops": [[0, 0.6], [4, 1.4], [5, 2], [12, 8]]
+                }
+            }
+        },
+        {
+            "id": "boundary-water",
+            "type": "line",
+            "source": "osm",
+            "source-layer": "boundary",
+            "minzoom": 4,
+            "filter": ["all", ["in", "admin_level", 2, 4], ["==", "maritime", 1]],
+            "layout": {
+                "line-cap": "round",
+                "line-join": "round",
+                "visibility": "visible"
+            },
+            "paint": {
+                "line-color": "rgba(154, 189, 214, 1)",
+                "line-opacity": {"stops": [[6, 0.6], [10, 1]]},
+                "line-width": {
+                    "base": 1,
+                    "stops": [[0, 0.6], [4, 1.4], [5, 2], [12, 8]]
+                }
+            }
+        },
+        {
+            "id": "railway",
+            "type": "line",
+            "metadata": {"mapbox:group": "1444849345966.4436"},
+            "source": "osm",
+            "source-layer": "transportation",
+            "filter": [
+                "all",
+                ["==", "$type", "LineString"],
+                ["!has", "service"],
+                ["!in", "brunnel", "bridge", "tunnel"],
+                ["==", "class", "rail"]
+            ],
+            "paint": {
+                "line-color": "#bbb",
+                "line-width": {"base": 1.4, "stops": [[14, 0.4], [15, 0.75], [20, 2]]}
+            }
+        },
+
     ]
   });
 

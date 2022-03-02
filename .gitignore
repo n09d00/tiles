@@ -6,3 +6,6 @@
 .vscode*
 .vs
 .clang-tidy
+*.mbtiles
+*.geojson
+*.rb
