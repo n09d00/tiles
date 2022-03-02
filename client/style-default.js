@@ -73,7 +73,7 @@ export const style = (map) => {
     "sources": {
         "osm": {
             "type": "vector",
-            "tiles": ["/{z}/{x}/{y}.mvt"],
+            "tiles": ["/germany/{z}/{x}/{y}.pbf"],
             "maxzoom": 14
         }
     },

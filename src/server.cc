@@ -155,8 +155,8 @@ struct server_settings : public conf::configuration {
     param(port_, "port", "the http port of the server");
   }
 
-  std::string db_fname_{"tiles.mdb"};
-  std::string res_dname_;
+  std::string db_fname_{""};
+  std::string res_dname_{"../client"};
   std::string geojson_dname_{""};  //<================= change here to your location of the folder containing all required geojson files
   uint16_t port_{8888};
 };
@@ -181,16 +181,17 @@ int run_tiles_server(int argc, char const** argv) {
     return 1;
   }
 
-  utl::verify(boost::filesystem::is_regular_file(opt.db_fname_.c_str()),
-              "tiles database file not found: {}", opt.db_fname_);
+//  utl::verify(boost::filesystem::is_regular_file(opt.db_fname_.c_str()),
+//             "tiles database file not found: {}", opt.db_fname_);
 
-  lmdb::env db_env = make_tile_database(opt.db_fname_.c_str(), kDefaultSize);
-  tile_db_handle handle{db_env};
-  auto const render_ctx = make_render_ctx(handle);
+//  lmdb::env db_env = make_tile_database(opt.db_fname_.c_str(), kDefaultSize);
+//  tile_db_handle handle{db_env};
+//  auto const render_ctx = make_render_ctx(handle);
   pack_handle pack_handle{opt.db_fname_.c_str()};
 
   auto const maybe_serve_tile = [&](auto const& req, auto& res) -> bool {
     static regex_matcher matcher{R"(^\/(\d+)\/(\d+)\/(\d+).mvt$)"};
+
     auto const decoded_url = url_decode(req);
     auto const match = matcher.match(decoded_url);
     if (!match) {
@@ -203,20 +204,20 @@ int run_tiles_server(int argc, char const** argv) {
       return true;
     }
 
-    t_log("received a request: {}", req.target());
+   t_log("received a request: {}", req.target());
     auto const tile = url_match_to_tile(*match);
 
     perf_counter pc;
-    auto rendered_tile = get_tile(handle, pack_handle, render_ctx, tile, pc);
+//    auto rendered_tile = get_tile(handle, pack_handle, render_ctx, tile, pc);
     perf_report_get_tile(pc);
 
-    if (rendered_tile) {
-      res.body() = std::move(*rendered_tile);
-      res.set(http::field::content_encoding, "deflate");
+//    if (rendered_tile) {
+//      res.body() = std::move(*rendered_tile);
+//     res.set(http::field::content_encoding, "deflate");
+//     res.result(http::status::ok);
+//    } else {
       res.result(http::status::ok);
-    } else {
-      res.result(http::status::no_content);
-    }
+//  }
     return true;
   };
 
@@ -269,16 +270,24 @@ int run_tiles_server(int argc, char const** argv) {
         found = true;
       }
     } else if(boost::algorithm::ends_with(fname, ".geojson") && !opt.geojson_dname_.empty()) {
-        std::cout << "here 3\n";
-        auto p = boost::filesystem::path{opt.geojson_dname_} / fname;
-        if (boost::filesystem::exists(p)) {
-          std::cout << "here 4\n";
-          utl::mmap_reader mem{p.string().c_str()};
-          res.body() = std::string{mem.m_.ptr(), mem.m_.size()};
-          found = true;
-        }
+      std::cout << "here 3\n";
+      auto p = boost::filesystem::path{opt.geojson_dname_} / fname;
+      if (boost::filesystem::exists(p)) {
+        std::cout << "here 4\n";
+        utl::mmap_reader mem{p.string().c_str()};
+        res.body() = std::string{mem.m_.ptr(), mem.m_.size()};
+        found = true;
+      }
+    } else if(boost::algorithm::ends_with(fname, ".pbf")) {
+      std::cout << "here 5\n";
+      auto p = boost::filesystem::path{"/germany"} / fname;
+      if (boost::filesystem::exists(p)) {
+        std::cout << "here 6\n";
+        utl::mmap_reader mem{p.string().c_str()};
+        res.body() = std::string{mem.m_.ptr(), mem.m_.size()};
+        found = true;
+      }
     }
-
     if (!found) {
       try {
         std::cout << "here 5\n";
@@ -302,7 +311,10 @@ int run_tiles_server(int argc, char const** argv) {
         res.set(http::field::content_type, "text/javascript");
       } else if (boost::algorithm::ends_with(fname, ".geojson")) {
         res.set(http::field::content_type, "text/json");
-      } else {
+      } else if (boost::algorithm::ends_with(fname, ".pbf")) {
+        res.set(http::field::content_type, "text/vector tile");
+        res.set(http::field::content_encoding, "gzip");
+      }else {
         std::cout << "file not supported\n";
       }
     } else {

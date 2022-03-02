@@ -23,7 +23,7 @@ let map = new mapboxgl.Map({
 const styles = { style_default, style_background };
 const style = (/[&|#]style=(.*?)(&|$)/g.exec(window.location.href) || [])[1] || "default";
 //preambel of the name of the geojson files
-const fname = 'http://localhost:8888/structure12/structure';
+const fname = '/structure12/structure';
 var stationRoutes = {};
 
 map.on('load', () => {

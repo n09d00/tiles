@@ -8,4 +8,4 @@
 .clang-tidy
 *.mbtiles
 *.geojson
-*.rb
+client/germany
